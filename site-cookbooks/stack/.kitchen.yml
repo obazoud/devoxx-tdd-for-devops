@@ -1,0 +1,21 @@
+---
+driver:
+  name: vagrant
+  network:
+    - - forwarded_port
+      - guest: 8080
+        host: 8080
+        auto_correct: true
+
+provisioner:
+  name: chef_solo
+
+platforms:
+  - name: ubuntu-13.04
+    driver_config:
+      box: opscode_ubuntu-13.04_devoxx-0.4.0
+
+suites:
+  - name: default
+    run_list:
+      - recipe[stack::default]

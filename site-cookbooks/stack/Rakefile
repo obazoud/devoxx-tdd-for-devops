@@ -1,0 +1,73 @@
+require 'rspec/core/rake_task'
+require 'chef/cookbook/metadata'
+require 'rubocop/rake_task'
+require 'foodcritic'
+require 'kitchen'
+
+def cookbook_metadata
+  metadata = Chef::Cookbook::Metadata.new
+  metadata.from_file 'metadata.rb'
+  metadata
+end
+
+def cookbook_name
+  name = cookbook_metadata.name
+  if name.nil? || name.empty?
+    File.basename(File.dirname(__FILE__))
+  else
+    name
+  end
+end
+
+COOKBOOK_NAME = ENV['COOKBOOK_NAME'] || cookbook_name
+COOKBOOKS_PATH = ENV['COOKBOOKS_PATH'] || '..'
+
+# Style tests. Rubocop and Foodcritic
+namespace :style do
+  desc 'Run Ruby static code analyzer'
+  Rubocop::RakeTask.new(:rubocop)
+
+  desc 'Run Foodcritic for Chef cookbook'
+  FoodCritic::Rake::LintTask.new(:foodcritic) do |t|
+    t.options = {
+      fail_tags: ['any'],
+      chef_version: '11.10.4',
+      tags: ['~FC009']
+    }
+  end
+
+  desc "Runs knife cookbook test"
+  task :knife do
+    sh 'knife', 'cookbook', 'test', COOKBOOK_NAME, '--config', './../../.chef/knife.rb', '--cookbook-path', COOKBOOKS_PATH
+  end
+end
+
+desc 'Run all style checks'
+task style: ['style:knife', 'style:rubocop', 'style:foodcritic']
+
+# Unit tests
+namespace :unit do
+  # Rspec and ChefSpec
+  desc "Run ChefSpec examples"
+  RSpec::Core::RakeTask.new(:spec)
+end
+
+desc 'Run all unit tests'
+task unit: ['unit:spec']
+
+# Integration tests. Kitchen.ci
+namespace :integration do
+  desc 'Run Test Kitchen with Vagrant (BATS, Serverspec, ...)'
+  task :kitchen do
+    Kitchen.logger = Kitchen.default_file_logger
+    Kitchen::Config.new.instances.each do |instance|
+      instance.test(:always)
+    end
+  end
+end
+
+desc 'Run all integration tests'
+task integration: ['integration:kitchen']
+
+# Default
+task default: ['style', 'unit', 'integration']
