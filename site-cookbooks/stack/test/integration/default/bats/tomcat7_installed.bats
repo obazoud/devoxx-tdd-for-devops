@@ -4,49 +4,53 @@
 
 @test "it creates tomcat directory" {
   # TODO: verifier que le repertoire /var/lib/tomcat7
-  skip
+  test -d /var/lib/tomcat7
 }
 
 @test "it creates tomcat init.d script" {
   # TODO: verifier que le fichier /etc/init.d/tomcat7 existe
-  skip
+  test -f /etc/init.d/tomcat7
 }
 
 @test "it creates tomcat7 user" {
   # TODO: verifier que le user tomcat7 existe
-  skip
+  id tomcat7
 }
 
 @test 'check tomcat7 service with ps' {
   # TODO: verifier que le processus tomcat7 existe
-  skip
+  ps -ef | grep -v grep | grep tomcat7
 }
 
 @test 'check tomcat service status' {
   # TODO: verifier que le service tomcat7 a un bon status
-  skip
+  service tomcat7 status
 }
 
 @test 'jhipster war file should exist' {
   # TODO: verifier que le fichier /var/lib/tomcat7/webapps/ROOT.war existe
-  skip
+  [ -f /var/lib/tomcat7/webapps/ROOT.war ]
   # TODO: verifier que le repertoire /var/lib/tomcat7/webapps/ROOT existe
-  skip
+  [ -d /var/lib/tomcat7/webapps/ROOT ]
 }
 
 @test 'it should listen on 8080' {
   # TODO: verifier qu'un processu ecoute sur le port 8080
-  skip
+  netstat -tunl | grep -- "^tcp.*:8080"
 }
 
 @test "it responses 200 on port 8080" {
   # TODO: verifier avec curl que http://localhost:8080/ renvoie un exit status a 0
   # et comme code http 200
-  skip
+  run curl --write-out %{http_code} --silent --output /dev/null http://localhost:8080/
+  [ "$status" -eq 0 ]
+  [ "$output" = "200" ]
 }
 
 @test "it responses with 'hipster' content" {
   # TODO: verifier avec curl que http://localhost:8080/ renvoie comme contenu
   # au moins 'hipster'
-  skip
+  run curl http://localhost:8080/
+  [ "$status" -eq 0 ]
+  echo "$output" | grep 'hipster'
 }
