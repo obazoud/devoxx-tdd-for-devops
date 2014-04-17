@@ -12,11 +12,13 @@ Devoxx 2014 Call for Paper: [Test Driven Infrastructure: TDD pour DevOps](http:/
 
 Demander aux speakers l'adresse pour downloader les logiciels.
 
-Ajouter la box 'devoxx' à Vagrant
+Ajouter la box 'devoxx' à Vagrant situé [ici](https://www.dropbox.com/s/g2yq8n89rs5us2g/opscode_ubuntu-13.04_devoxx-0.4.0.box).
 ```bash
 % vagrant box add opscode_ubuntu-13.04_devoxx-0.4.0 opscode_ubuntu-13.04_devoxx-0.4.0.box
 % vagrant box list
 ```
+
+NOTE: La box a été créée à l'aide d'un fork du projet [Bento](https://github.com/obazoud/bento/tree/devoxx), branche devoxx.
 
 ## Git
 
